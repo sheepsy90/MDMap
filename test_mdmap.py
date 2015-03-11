@@ -1,12 +1,27 @@
-# MDMap
+# -*- coding:utf-8 -*-
+import unittest
+from mdmap import MDMap
 
- This is a small topping for sqlite3 with a very simple syntax to store and get data.
- The main reason I build this is to hold a lot of data without a schema in one place and query
- it according to my analysis needs.
 
- It is probably not the most efficient way to do such a thing and I put it together in only a
- few hours but it works.
+class TestBigTable(unittest.TestCase):
 
+    def test_massive_data(self):
+        bt = MDMap(':memory:')
+
+        for i in range(1000):
+            bt.insert(str(i), "userId", "ABCDEFGH")
+            bt.insert(str(i), "name", "Robert")
+            bt.insert(str(i), "address", "Address Robert")
+
+        for i in range(1000):
+            bt.insert(str(i+1000), "userId", "XXYYXXYY")
+            bt.insert(str(i+1000), "name", "Maike")
+            bt.insert(str(i+1000), "address", "Address Maike")
+
+        result = bt.select("SELECT name, addgress WHERE userId=ABCDEFGH OR userId=ADADADAD")
+        self.assertEqual(1000, len(result))
+
+    def test_logical_statement(self):
         bt = MDMap(':memory:')
 
         bt.insert(1, "user_id", "roberts user id")
